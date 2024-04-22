@@ -1,0 +1,220 @@
+swagger: "2.0"
+info:
+  title: API for RentHub App
+  description: This is the documentation of RentHub Mobile application API
+  version: 1.0
+  contact:
+    email: rehmanwaqas466@gmail.com
+  servers:
+    -url: "https://localhost:4500/"
+  description: This is my local server
+schemes: [http, https]
+
+tags:
+  - name: User
+    description: Operations about User
+  - name: Product
+    description: Access our RentHub products
+
+paths:
+# SignUp API
+  /api/signup:
+    post:
+      tags: 
+        - User
+      summary: Adds a new user
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: Sign Up your account
+          schema:
+            $ref: "#/components/schemas/User"
+      required: true
+      responses:
+        '201':
+          description: User Created Successfully
+        '400':
+          description: User Already Exist
+        '422':
+          description: Required Field Missing  
+        '500':
+          description: Internal server error
+
+# Login API
+  /api/login:
+    post:
+      tags: 
+        - User
+      summary: User Login into the System
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: Login your Account
+          schema:
+            type: object
+            required:
+              - email
+              - password
+            properties:
+              email: 
+                type: string
+                example: johndoe@gmail.com
+              password:
+                type: string
+                example: hello123                
+      responses:
+        '201':
+          description: Successfully Login
+        '400':
+          description: Incorrect email or Password
+        '404':
+          description: User not  found
+        '500':
+          description: Server error occurred
+
+# Edit User API
+  /api/update-user:
+    put:
+      tags:
+        - User
+      summary: Update User Information
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: Update User Information
+          schema:
+            type: object
+            required:
+              - _id
+            properties:
+              _id:
+                type: string
+                example: 5f7jbsauuw7432uni3nri
+              name:
+                type: string
+                example: Waqas
+              email: 
+                type: string
+                example: johndoe@gmail.com   
+      responses:
+        '201':
+          description: user updated successfully
+        '404':
+          description: User not found
+        '500':
+          description: Server error occurred
+
+# Forgot Password API
+  /api/forgotpassword:
+    post:
+      tags: 
+        - User
+      summary: Forgot your password
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: change or Forget Your Password
+          schema:
+            type: object
+            required:
+              - email
+            properties:
+              email: 
+                type: string
+                example: johndoe@gmail.com                
+      responses:
+        '200':
+          description: Request Send Successfully
+        '404':
+          description: User not  found
+        '500':
+          description: Server error occurred
+
+# Password Update API
+  /api/update-password:
+    put:
+      tags: 
+        - User
+      summary: Update your password
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: Update Your Password
+          schema:
+            type: object
+            required:
+              - tokenId
+              - password
+            properties:
+              tokenId: 
+                type: string
+              password:
+                type: string
+                example: add new password               
+      responses:
+        '201':
+          description: Password Updated Succesfully
+        '400':
+          description: Invalid or Expired Token
+        '404':
+          description: User not  found
+
+# Delete User API
+  /api/delete-user:
+    delete:
+      tags:
+        - User
+      summary: Delete User Account
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: Delete User Account
+          schema:
+            type: object
+            required:
+              - name
+            properties:
+              name:
+                type: string
+                example: john
+      responses:
+        '201':
+          description: User Deleted Successfully
+        '404':
+          description: User not found
+        '500':
+          description: Server error occurred
+
+components:
+  schemas:
+    User:
+      type: object
+      properties: 
+        name:
+          type: string
+          example: "Waqas"
+        email:
+          type: string
+          example: "waqas@gmail.com"
+        password:
+          type: string
+          example: "12345678"
+      
