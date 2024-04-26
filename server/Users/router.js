@@ -7,10 +7,14 @@ const {
   forgotPass,
   updatePass,
   deleteuser,
+  searchUser,
+  searchByEmail,
 } = require("./controller");
 const router = express.Router();
 
 router.get("/all-users", allusers);
+router.get("/search-user/:name", searchUser);
+router.get("/search-user-email/:email", searchByEmail);
 
 router.post("/login", login);
 router.post("/signup", signup);

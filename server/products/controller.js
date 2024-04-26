@@ -28,8 +28,23 @@ const addProduct = async (req, res) => {
   }
 };
 
-const updateProduct = (req, res) => {
-  res.send("Update Product");
+const updateProduct = async (req, res) => {
+  const { name, price, description, category, image } = req.body;
+  try {
+    const filter = { name };
+    const update = { price, description, category, image };
+
+    const updatedProduct = await productSchema.findOneAndUpdate(
+      filter,
+      update,
+      { new: true }
+    );
+    res
+      .status(200)
+      .json({ message: "Product Updated Successfully", updatedProduct });
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error" });
+  }
 };
 
 const deleteProduct = (req, res) => {

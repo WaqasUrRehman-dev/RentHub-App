@@ -203,6 +203,60 @@ paths:
         '500':
           description: Server error occurred
 
+# Search User API
+  /api/search-user/:name:
+    get:
+      tags:
+        - User
+      summary: Search User by Name
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - name: name
+          in: query
+          description: Name of the user
+          required: true
+          schema:
+            type: string
+            example: john
+      responses:
+        '200':
+          description: User Found
+        '404':
+          description: User not found
+        '500':
+          description: Server error occurred
+
+# Get User by Id
+  /api/search-user-email/:email :
+    get:
+      get:
+      tags:
+        - User
+      summary: Search User by Email
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - name: email
+          in: query
+          description: Email of the user
+          required: true
+          schema:
+            type: string
+            example: johndoe@gmail.com
+      responses:
+        '200':
+          description: User Found
+        '404':
+          description: User not found
+        '500':
+          description: Server error occurred
+
+# Model
 components:
   schemas:
     User:

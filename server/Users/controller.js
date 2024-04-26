@@ -156,6 +156,33 @@ const deleteuser = async (req, res) => {
   }
 };
 
+const searchUser = async (req, res) => {
+  const { name } = req.query;
+  if (!name) {
+    res.status(404).json({ message: "User not found" });
+  }
+  try {
+    const user = await userSchema.find({ name });
+    res.status(200).json({ message: "User Found", user });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const searchByEmail = async (req, res) => {
+  const { email } = req.query;
+  try {
+    const user = await userSchema.findOne({ email });
+    if (user) {
+      res.status(200).json({ message: "User Found", user });
+    } else {
+      res.status(404).json({ message: "User not Found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   allusers,
   signup,
@@ -164,4 +191,6 @@ module.exports = {
   forgotPass,
   updatePass,
   deleteuser,
+  searchUser,
+  searchByEmail,
 };
