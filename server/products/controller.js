@@ -47,8 +47,22 @@ const updateProduct = async (req, res) => {
   }
 };
 
-const deleteProduct = (req, res) => {
-  res.send("Delete Product");
+const deleteProduct = async (req, res) => {
+  const { _id } = req.body;
+  if (!_id) {
+    res.status(400).json({ message: "Invalid request" });
+  } else {
+    try {
+      await productSchema.findIdAndDelete({ _id });
+      const allProducts = await productSchema.find();
+      res.status(200).json({
+        message: "Product Deleted Successfully",
+        Products: allProducts,
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  }
 };
 
 const getProducts = (req, res) => {
