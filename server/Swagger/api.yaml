@@ -256,6 +256,157 @@ paths:
         '500':
           description: Server error occurred
 
+# Add Product API
+  /api/addProduct:
+    post:
+      tags:
+        - Product
+      summary: Add Product
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: Add Product
+          schema:
+            $ref: "#/components/schemas/Products"
+      requires: true
+      responses:
+        '201':
+          description: Product Added Successfully
+        '400':
+          description: Product Already Exist
+        '422':
+          description: Required Field Missing
+        '500':
+          description: Internal server error
+
+# Edit Product API
+  /api/editProduct:
+    put:
+      tags:
+        - Product
+      summary: Edit Product
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: Edit your Product
+          schema:
+            type: object
+            required:
+              - _id
+            properties:
+              _id:
+                type: string
+                example: 5f7jbsauuw7432uni3nri
+              name:
+                type: string
+                example: Iphone 11
+              price:
+                type: number
+                example: 1000
+              description:
+                type: string
+                example: This is the latest model of Iphone
+              category:
+                type: string
+                example: Mobile
+              image:
+                type: string
+                example: https://www.google.com
+      responses:
+        '201':
+          description: Product Updated Successfully
+        '404':
+          description: Product not found
+        '500':
+          description: Server error occurred
+
+# Delete Product API
+  /api/deleteProduct:
+    delete:
+      tags:
+        - Product
+      summary: Delete Product
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: Delete Product
+          schema:
+            type: object
+            required:
+              - _id
+            properties:
+              _id:
+                type: string
+                example: 5f7jbsauuw7432uni3nri
+      responses:
+        '201':
+          description: Product Deleted Successfully
+        '404':
+          description: Product not found
+        '500':
+          description: Server error occurred
+
+# Product find by name API
+  /api/findByName:
+    get:
+      tags:
+        - Product
+      summary: Find Product by Name
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - name: name
+          in: query
+          description: Name of the product
+          required: true
+          schema:
+            type: string
+            example: Iphone 11
+      responses:
+        '200':
+          description: Product Found
+        '404':
+          description: Product not found
+        '500':
+          description: Server error occurred
+
+# Find Product by category API
+  /api/findByCategory:
+    get:
+      tags:
+        - Product
+      summary: Find Product by Category
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - name: category
+          in: query
+          description: Category of the product
+          required: true
+          schema:
+            type: string
+            example: Mobile
+      responses:
+        '200':
+          description: Product Found
+        '404':
+          description: Product not found
+        '500':
+          description: Server error occurred
+
 # Model
 components:
   schemas:
@@ -271,4 +422,22 @@ components:
         password:
           type: string
           example: "12345678"
+    Products:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Iphone 11"
+        price:
+          type: number
+          example: 1000
+        description:
+          type: string
+          example: "This is the latest model of Iphone"
+        category:
+          type: string
+          example: "Mobile"
+        image:
+          type: string
+          example: "https://www.google.com"
       
