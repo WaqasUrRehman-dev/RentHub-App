@@ -407,6 +407,24 @@ paths:
         '500':
           description: Server error occurred
 
+# Get All Products
+  /api/allProducts:
+    get:
+      tags:
+        - Product
+      summary: Get All Products
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        '200':
+          description: All Products
+        '404':
+          description: No Product Found
+        '500':
+          description: Server error occurred
+
 # Model
 components:
   schemas:

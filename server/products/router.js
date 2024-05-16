@@ -4,9 +4,9 @@ const {
   addProduct,
   deleteProduct,
   updateProduct,
-  getProducts,
   findByName,
   findByCategory,
+  allProducts,
 } = require("./controller");
 
 router.post("/addProduct", addProduct);
@@ -15,7 +15,7 @@ router.delete("/deleteProduct", deleteProduct);
 
 router.put("/editProduct", updateProduct);
 
-router.get("/getProducts", getProducts);
+router.get("/allProducts", allProducts);
 router.get("/findByName", findByName);
 router.get("/findByCategory", findByCategory);
 

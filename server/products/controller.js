@@ -1,9 +1,9 @@
 const productSchema = require("./schema");
 
 const addProduct = async (req, res) => {
-  const { name, price, category, description, image } = req.body;
+  const { name, price, category, description, images } = req.body;
 
-  if (!name && !price && !category && !description && !image) {
+  if (!name && !price && !category && !description && !images) {
     res.status(422).json({ message: "Required Field Missing" });
   } else {
     try {
@@ -16,7 +16,7 @@ const addProduct = async (req, res) => {
           price,
           category,
           description,
-          image,
+          images,
         });
         res
           .status(201)
@@ -29,10 +29,10 @@ const addProduct = async (req, res) => {
 };
 
 const updateProduct = async (req, res) => {
-  const { _id, name, price, description, category, image } = req.body;
+  const { _id, name, price, description, category, images } = req.body;
   try {
     const filter = { _id };
-    const update = { name, price, description, category, image };
+    const update = { name, price, description, category, images };
     const updatedProduct = await productSchema.findOneAndUpdate(
       filter,
       update,
@@ -68,10 +68,13 @@ const deleteProduct = async (req, res) => {
   }
 };
 
-const getProducts = async (req, res) => {
+const allProducts = async (req, res) => {
   try {
-    const allProducts = await productSchema.find();
-    res.status(200).json({ Products: allProducts });
+    const products = await productSchema.find();
+    res.status(200).json({ Products: products });
+    if (!products) {
+      res.status(404).json({ message: "Product not found" });
+    }
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });
   }
@@ -109,7 +112,7 @@ module.exports = {
   addProduct,
   updateProduct,
   deleteProduct,
-  getProducts,
+  allProducts,
   findByName,
   findByCategory,
 };

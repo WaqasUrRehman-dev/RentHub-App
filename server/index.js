@@ -8,6 +8,9 @@ const app = express();
 const port = process.env.SERVER_PORT || 3000;
 const user_Route = require("./Users/router");
 const product_Route = require("./products/router");
+const cors = require("cors");
+
+app.use(cors());
 
 app.use(express.json());
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerJsDocs));
