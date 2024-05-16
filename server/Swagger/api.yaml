@@ -455,7 +455,16 @@ components:
         category:
           type: string
           example: "Mobile"
-        image:
+        image1:
+          type: string
+          example: "https://www.google.com"
+        image2:
+          type: string
+          example: "https://www.google.com"
+        image3:
+          type: string
+          example: "https://www.google.com"
+        image4:
           type: string
           example: "https://www.google.com"
       

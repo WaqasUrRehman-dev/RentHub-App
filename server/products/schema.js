@@ -17,44 +17,22 @@ const productSchema = new Schema({
     type: String,
     required: true,
   },
-  images: [
-    {
-      type: String,
-      reqiuired: true,
-      description: "Front View",
-      createdAt: {
-        type: Date,
-        default: Date.now,
-      },
-    },
-    {
-      type: String,
-      reqiuired: true,
-      description: "Back View",
-      createdAt: {
-        type: Date,
-        default: Date.now,
-      },
-    },
-    {
-      type: String,
-      reqiuired: true,
-      description: "Side View",
-      createdAt: {
-        type: Date,
-        default: Date.now,
-      },
-    },
-    {
-      type: String,
-      reqiuired: true,
-      description: "Side View",
-      createdAt: {
-        type: Date,
-        default: Date.now,
-      },
-    },
-  ],
+  image1: {
+    type: String,
+    required: true,
+  },
+  image2: {
+    type: String,
+    required: true,
+  },
+  image3: {
+    type: String,
+    required: true,
+  },
+  image4: {
+    type: String,
+    required: true,
+  },
 });
 
 const Product = model("product", productSchema);

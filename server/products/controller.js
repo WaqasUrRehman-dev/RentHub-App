@@ -1,9 +1,19 @@
 const productSchema = require("./schema");
 
 const addProduct = async (req, res) => {
-  const { name, price, category, description, images } = req.body;
+  const { name, price, category, description, image1, image2, image3, image4 } =
+    req.body;
 
-  if (!name && !price && !category && !description && !images) {
+  if (
+    !name &&
+    !price &&
+    !category &&
+    !description &&
+    !image1 &&
+    !image2 &&
+    !image3 &&
+    !image4
+  ) {
     res.status(422).json({ message: "Required Field Missing" });
   } else {
     try {
@@ -16,7 +26,10 @@ const addProduct = async (req, res) => {
           price,
           category,
           description,
-          images,
+          image1,
+          image2,
+          image3,
+          image4,
         });
         res
           .status(201)
@@ -29,10 +42,10 @@ const addProduct = async (req, res) => {
 };
 
 const updateProduct = async (req, res) => {
-  const { _id, name, price, description, category, images } = req.body;
+  const { _id, name, price, description, category, image1 } = req.body;
   try {
     const filter = { _id };
-    const update = { name, price, description, category, images };
+    const update = { name, price, description, category, image1 };
     const updatedProduct = await productSchema.findOneAndUpdate(
       filter,
       update,
