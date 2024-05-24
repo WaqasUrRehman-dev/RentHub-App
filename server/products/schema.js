@@ -1,6 +1,17 @@
 const { Schema, model } = require("mongoose");
 
+const imageSchema = new Schema({
+  images: {
+    type: String,
+    required: true,
+  },
+});
+
 const productSchema = new Schema({
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: "user",
+  },
   name: {
     type: String,
     required: true,
@@ -17,21 +28,14 @@ const productSchema = new Schema({
     type: String,
     required: true,
   },
-  image1: {
-    type: String,
-    required: true,
-  },
-  image2: {
-    type: String,
-    required: true,
-  },
-  image3: {
-    type: String,
-    required: true,
-  },
-  image4: {
-    type: String,
-    required: true,
+  images: {
+    type: [imageSchema],
+    validate: {
+      validator: function (arr) {
+        return arr.length >= 2 && arr.length <= 20;
+      },
+      message: "A product must have at least 2 images and at most 20 images.",
+    },
   },
 });
 

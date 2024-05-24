@@ -1,18 +1,14 @@
 const productSchema = require("./schema");
 
 const addProduct = async (req, res) => {
-  const { name, price, category, description, image1, image2, image3, image4 } =
+  const { name, price, category, description, images } =
     req.body;
 
   if (
     !name &&
     !price &&
     !category &&
-    !description &&
-    !image1 &&
-    !image2 &&
-    !image3 &&
-    !image4
+    !description && !images
   ) {
     res.status(422).json({ message: "Required Field Missing" });
   } else {
@@ -26,10 +22,7 @@ const addProduct = async (req, res) => {
           price,
           category,
           description,
-          image1,
-          image2,
-          image3,
-          image4,
+          images
         });
         res
           .status(201)
