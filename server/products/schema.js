@@ -28,6 +28,14 @@ const productSchema = new Schema({
     type: String,
     required: true,
   },
+  location:{
+    type: String,
+    required: true,
+  },
+  type: {
+    type: String,
+    required: true,
+  },
   images: {
     type: [imageSchema],
     validate: {

@@ -407,6 +407,32 @@ paths:
         '500':
           description: Server error occurred
 
+# Find Product by location API
+  /api/findByLocation:
+    get:
+      tags:
+        - Product
+      summary: Find Product by Location
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - name: location
+          in: query
+          description: Location of the product
+          required: true
+          schema:
+            type: string
+            example: Mobile
+      responses:
+        '200':
+          description: Product Found
+        '404':
+          description: Product not found
+        '500':
+          description: Server error occurred
+
 # Get All Products
   /api/allProducts:
     get:
@@ -455,16 +481,13 @@ components:
         category:
           type: string
           example: "Mobile"
-        image1:
+        location:
           type: string
-          example: "https://www.google.com"
-        image2:
+          example: "Lahore"
+        type:
           type: string
-          example: "https://www.google.com"
-        image3:
-          type: string
-          example: "https://www.google.com"
-        image4:
+          example: "Rent"
+        images:
           type: string
           example: "https://www.google.com"
       

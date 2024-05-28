@@ -7,6 +7,7 @@ const {
   findByName,
   findByCategory,
   allProducts,
+  findByLocation,
 } = require("./controller");
 
 router.post("/addProduct", addProduct);
@@ -18,5 +19,6 @@ router.put("/editProduct", updateProduct);
 router.get("/allProducts", allProducts);
 router.get("/findByName", findByName);
 router.get("/findByCategory", findByCategory);
+router.get("/findByLocation", findByLocation);
 
 module.exports = router;

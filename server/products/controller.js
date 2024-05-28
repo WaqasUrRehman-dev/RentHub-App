@@ -1,14 +1,17 @@
 const productSchema = require("./schema");
 
 const addProduct = async (req, res) => {
-  const { name, price, category, description, images } =
+  const { name, price, category, description, location, type, images } =
     req.body;
 
   if (
     !name &&
     !price &&
     !category &&
-    !description && !images
+    !description &&
+    location &&
+    type &&
+    !images
   ) {
     res.status(422).json({ message: "Required Field Missing" });
   } else {
@@ -22,7 +25,9 @@ const addProduct = async (req, res) => {
           price,
           category,
           description,
-          images
+          location,
+          type,
+          images,
         });
         res
           .status(201)
@@ -114,6 +119,20 @@ const findByCategory = async (req, res) => {
   }
 };
 
+const findByLocation = async (req, res) => {
+  const { location } = req.query;
+  if (!location) {
+    res.status(404).json({ message: "location not found" });
+  } else {
+    try {
+      const findProduct = await productSchema.findOne({ location });
+      res.status(200).json({ Product: findProduct });
+    } catch (error) {
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  }
+};
+
 module.exports = {
   addProduct,
   updateProduct,
@@ -121,4 +140,5 @@ module.exports = {
   allProducts,
   findByName,
   findByCategory,
+  findByLocation,
 };
