@@ -1,12 +1,5 @@
 const { Schema, model } = require("mongoose");
 
-const imageSchema = new Schema({
-  images: {
-    type: String,
-    required: true,
-  },
-});
-
 const productSchema = new Schema({
   userId: {
     type: Schema.Types.ObjectId,
@@ -28,7 +21,7 @@ const productSchema = new Schema({
     type: String,
     required: true,
   },
-  location:{
+  location: {
     type: String,
     required: true,
   },
@@ -37,7 +30,7 @@ const productSchema = new Schema({
     required: true,
   },
   images: {
-    type: [imageSchema],
+    type: [String],
     validate: {
       validator: function (arr) {
         return arr.length >= 2 && arr.length <= 20;

@@ -488,6 +488,6 @@ components:
           type: string
           example: "Rent"
         images:
-          type: string
-          example: "https://www.google.com"
+          type: [string]
+          example: ["https://www.google.com"]
       

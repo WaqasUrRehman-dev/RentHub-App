@@ -4,19 +4,18 @@ const addProduct = async (req, res) => {
   const { name, price, category, description, location, type, images } =
     req.body;
 
-  if (
-    !name &&
-    !price &&
-    !category &&
-    !description &&
-    location &&
-    type &&
-    !images
-  ) {
-    res.status(422).json({ message: "Required Field Missing" });
-  } else {
-    try {
+  try {
+    if (
+      name &&
+      price &&
+      category &&
+      description &&
+      location &&
+      type &&
+      images
+    ) {
       const checkProduct = await productSchema.exists({ name });
+
       if (checkProduct) {
         res.status(400).json({ message: "Product already exists" });
       } else {
@@ -29,14 +28,42 @@ const addProduct = async (req, res) => {
           type,
           images,
         });
-        res
-          .status(201)
-          .json({ message: "Product created Successfully", createProduct });
+
+        res.status(201).json({
+          message: "Product created Successfully",
+          createProduct,
+        });
       }
-    } catch (error) {
-      res.status(500).json({ message: "Internal Server Error" });
+    } else {
+      res.status(422).json({ message: "Required Field Missing" });
     }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
+
+  // else {
+  //   try {
+  //     const checkProduct = await productSchema.exists({ name });
+  //     if (checkProduct) {
+  //       res.status(400).json({ message: "Product already exists" });
+  //     } else {
+  //       const createProduct = await productSchema.create({
+  //         name,
+  //         price,
+  //         category,
+  //         description,
+  //         location,
+  //         type,
+  //         images,
+  //       });
+  //       res
+  //         .status(201)
+  //         .json({ message: "Product created Successfully", createProduct });
+  //     }
+  //   } catch (error) {
+  //     res.status(500).json({ message: error });
+  //   }
+  // }
 };
 
 const updateProduct = async (req, res) => {
