@@ -1,7 +1,7 @@
 const productSchema = require("./schema");
 
 const addProduct = async (req, res) => {
-  const { name, price, category, description, location, type, images } =
+  const { user, name, price, category, description, location, type, images } =
     req.body;
 
   try {
@@ -20,6 +20,7 @@ const addProduct = async (req, res) => {
         res.status(400).json({ message: "Product already exists" });
       } else {
         const createProduct = await productSchema.create({
+          user,
           name,
           price,
           category,
@@ -41,29 +42,6 @@ const addProduct = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 
-  // else {
-  //   try {
-  //     const checkProduct = await productSchema.exists({ name });
-  //     if (checkProduct) {
-  //       res.status(400).json({ message: "Product already exists" });
-  //     } else {
-  //       const createProduct = await productSchema.create({
-  //         name,
-  //         price,
-  //         category,
-  //         description,
-  //         location,
-  //         type,
-  //         images,
-  //       });
-  //       res
-  //         .status(201)
-  //         .json({ message: "Product created Successfully", createProduct });
-  //     }
-  //   } catch (error) {
-  //     res.status(500).json({ message: error });
-  //   }
-  // }
 };
 
 const updateProduct = async (req, res) => {
