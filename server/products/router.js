@@ -4,10 +4,9 @@ const {
   addProduct,
   deleteProduct,
   updateProduct,
-  findByName,
-  findByCategory,
   allProducts,
-  findByLocation,
+  yourPost,
+  searchProduct,
 } = require("./controller");
 
 router.post("/addProduct", addProduct);
@@ -16,9 +15,10 @@ router.delete("/deleteProduct", deleteProduct);
 
 router.put("/editProduct", updateProduct);
 
+router.get("/youPost", yourPost);
 router.get("/allProducts", allProducts);
-router.get("/findByName", findByName);
-router.get("/findByCategory", findByCategory);
-router.get("/findByLocation", findByLocation);
+router.get("/searchProduct", searchProduct);
+// router.get("/findByCategory", findByCategory);
+// router.get("/findByLocation", findByLocation);
 
 module.exports = router;

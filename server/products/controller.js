@@ -1,7 +1,8 @@
 const productSchema = require("./schema");
+const userSchema = require("../Users/schema");
 
 const addProduct = async (req, res) => {
-  const { user, name, price, category, description, location, type, images } =
+  const { name, price, category, description, location, type, images } =
     req.body;
 
   try {
@@ -20,7 +21,6 @@ const addProduct = async (req, res) => {
         res.status(400).json({ message: "Product already exists" });
       } else {
         const createProduct = await productSchema.create({
-          user,
           name,
           price,
           category,
@@ -30,7 +30,9 @@ const addProduct = async (req, res) => {
           images,
         });
 
-        res.status(201).json({
+        console.log(createProduct);
+
+        return res.status(201).json({
           message: "Product created Successfully",
           createProduct,
         });
@@ -39,9 +41,22 @@ const addProduct = async (req, res) => {
       res.status(422).json({ message: "Required Field Missing" });
     }
   } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+const yourPost = async (req, res) => {
+  try {
+    const user = await userSchema.findOne({ email: req.body.email });
+    if (user) {
+      const allProducts = await productSchema.find();
+      res.status(200).json({ message: "Your Post", allProducts });
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
     res.status(500).json({ message: error.message });
   }
-
 };
 
 const updateProduct = async (req, res) => {
@@ -96,54 +111,46 @@ const allProducts = async (req, res) => {
   }
 };
 
-const findByName = async (req, res) => {
-  const { name } = req.query;
-  if (!name) {
-    res.status(404).json({ message: "Product not found" });
-  } else {
-    try {
-      const findProduct = await productSchema.findOne({ name });
-      res.status(200).json({ Product: findProduct });
-    } catch (error) {
-      res.status(500).json({ message: "Internal Server Error" });
+const searchProduct = async (req, res) => {
+  const { name, category, location } = req.query;
+  console.log(category, location, name);
+
+  try {
+    let filter = {};
+
+    if (name) {
+      filter.name = { $regex: name, $options: "i" };
+    } else if (category) {
+      filter.category = { $regex: category, $options: "i" };
+    } else if (location) {
+      filter.location = { $regex: location, $options: "i" };
+    } else {
+      res.status(404).json({ message: "Product not found" });
     }
+
+    // Check if the filter is empty
+    if (Object.keys(filter).length === 0) {
+      return res.status(400).json({ message: "No search parameters provided" });
+    }
+
+    const findProduct = await productSchema.find(filter);
+
+    if (findProduct.length > 0) {
+      return res.status(200).json({ Products: findProduct });
+    } else {
+      return res.status(404).json({ message: "Product not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
-const findByCategory = async (req, res) => {
-  const { category } = req.query;
-  if (!category) {
-    res.status(404).json({ message: "Product not found" });
-  } else {
-    try {
-      const findProduct = await productSchema.findOne({ category });
-      res.status(200).json({ Product: findProduct });
-    } catch (error) {
-      res.status(500).json({ message: "Internal Server Error" });
-    }
-  }
-};
-
-const findByLocation = async (req, res) => {
-  const { location } = req.query;
-  if (!location) {
-    res.status(404).json({ message: "location not found" });
-  } else {
-    try {
-      const findProduct = await productSchema.findOne({ location });
-      res.status(200).json({ Product: findProduct });
-    } catch (error) {
-      res.status(500).json({ message: "Internal Server Error" });
-    }
-  }
-};
 
 module.exports = {
   addProduct,
   updateProduct,
   deleteProduct,
   allProducts,
-  findByName,
-  findByCategory,
-  findByLocation,
+  searchProduct,
+  yourPost,
 };
