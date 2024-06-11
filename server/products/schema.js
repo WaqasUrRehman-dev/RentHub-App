@@ -1,10 +1,6 @@
 const { Schema, model } = require("mongoose");
 
 const productSchema = new Schema({
-  user: {
-    type: Schema.Types.ObjectId,
-    ref: "user",
-  },
   name: {
     type: String,
     required: true,
@@ -29,6 +25,13 @@ const productSchema = new Schema({
     type: String,
     required: true,
   },
+
+  createdBy: {
+    type: Schema.Types.ObjectId,
+    ref: "user",
+    required: true,
+  },
+
   images: {
     type: [String],
     validate: {

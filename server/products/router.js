@@ -8,14 +8,15 @@ const {
   yourPost,
   searchProduct,
 } = require("./controller");
+const protectRoute = require("../middleware/protectRoute");
 
-router.post("/addProduct", addProduct);
+router.post("/addProduct", protectRoute, addProduct);
 
 router.delete("/deleteProduct", deleteProduct);
 
 router.put("/editProduct", updateProduct);
 
-router.get("/youPost", yourPost);
+router.post("/youPost", protectRoute, yourPost);
 router.get("/allProducts", allProducts);
 router.get("/searchProduct", searchProduct);
 // router.get("/findByCategory", findByCategory);

@@ -1,9 +1,9 @@
 const productSchema = require("./schema");
-const userSchema = require("../Users/schema");
 
 const addProduct = async (req, res) => {
   const { name, price, category, description, location, type, images } =
     req.body;
+  const createdBy = req.user.id;
 
   try {
     if (
@@ -18,9 +18,10 @@ const addProduct = async (req, res) => {
       const checkProduct = await productSchema.exists({ name });
 
       if (checkProduct) {
-        res.status(400).json({ message: "Product already exists" });
+        return res.status(400).json({ message: "Product already exists" });
       } else {
         const createProduct = await productSchema.create({
+          createdBy,
           name,
           price,
           category,
@@ -38,22 +39,20 @@ const addProduct = async (req, res) => {
         });
       }
     } else {
-      res.status(422).json({ message: "Required Field Missing" });
+      return res.status(422).json({ message: "Required Field Missing" });
     }
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ message: error.message });
   }
 };
 
 const yourPost = async (req, res) => {
+  const createdBy = req.user.id;
   try {
-    const user = await userSchema.findOne({ email: req.body.email });
-    if (user) {
-      const allProducts = await productSchema.find();
-      res.status(200).json({ message: "Your Post", allProducts });
-    } else {
-      res.status(404).json({ message: "User not found" });
-    }
+    const allProducts = await productSchema.find({ createdBy });
+    console.log(allProducts);
+    res.status(200).json({ message: "Your Post", allProducts });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -144,7 +143,6 @@ const searchProduct = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
-
 
 module.exports = {
   addProduct,

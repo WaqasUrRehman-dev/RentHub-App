@@ -8,6 +8,7 @@ const {
   SuccessForgotPasswordMail,
 } = require("../model/email");
 const Token = require("../Token/schema");
+const generateToken = require("../utils/generateToken");
 
 const allusers = async (req, res) => {
   try {
@@ -23,15 +24,18 @@ const signup = async (req, res) => {
   if (name && email && password) {
     try {
       const user = await userSchema.exists({ email });
-      if (!user) {
-        const newuser = await userSchema.create({
-          name,
-          email,
-          password: await hash(password, 10),
-        });
-        res.status(201).json({ message: "User Created Successfully", newuser });
-      } else {
-        res.status(400).json({ message: "User Already Exist" });
+
+      if (user) {
+        return res.status(400).json({ message: "User already exists" });
+      }
+      const newUser = await userSchema.create({
+        name,
+        email,
+        password: await hash(password, 10),
+      });
+
+      if (newUser) {
+        generateToken(newUser._id, res);
       }
     } catch (error) {
       res.status(500).json({ message: error.message });
@@ -50,19 +54,20 @@ const login = async (req, res) => {
       if (checkUser) {
         const decryptPass = await compare(password, checkUser.password);
 
-        if (decryptPass && email == checkUser.email) {
-          const token = sign(
-            {
-              name: checkUser.name,
-              email: checkUser.email,
-              role: checkUser.role,
-            },
-            process.env.JWT_SECRET
-          );
-          res.status(200).json({ message: "Successfully Login", token });
-        } else {
-          res.status(400).json({ message: "Incorrect Password" });
+        if (!decryptPass && !email == checkUser.email) {
+          return res.status(400).json({ message: "Incorrect Password" });
         }
+
+        generateToken(checkUser._id, res);
+        return res
+          .status(200)
+          .json({
+            message: "Successfully Login",
+            _id: checkUser._id,
+            name: checkUser.name,
+            email: checkUser.email,
+          });
+       
       } else {
         res.status(404).json({ message: "User not found" });
       }

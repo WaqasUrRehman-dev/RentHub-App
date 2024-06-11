@@ -9,9 +9,10 @@ const port = process.env.SERVER_PORT || 3000;
 const user_Route = require("./Users/router");
 const product_Route = require("./products/router");
 const cors = require("cors");
+const cookieParser = require("cookie-parser")
 
 app.use(cors());
-
+app.use(cookieParser());
 app.use(express.json());
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerJsDocs));
 app.use("/api", user_Route);
