@@ -8,20 +8,26 @@ const app = express();
 const port = process.env.SERVER_PORT || 3000;
 const user_Route = require("./Users/router");
 const product_Route = require("./products/router");
+const message_Route = require("./message/router")
 const cors = require("cors");
-const cookieParser = require("cookie-parser")
+const cookieParser = require("cookie-parser");
 
+//Middlewares
 app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
+
+//Routes
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerJsDocs));
 app.use("/api", user_Route);
 app.use("/api", product_Route);
+app.use("/api", message_Route);
 
+//Server
 app.listen(port, () => {
   connectDB(process.env.MONGO_URL)
     .then(() => {
-      console.log(`DB Connected Succesffuly - App listening on port ${port}`);
+      console.log(`App listening on port ${port}`);
     })
     .catch((err) => {
       console.log(err);
