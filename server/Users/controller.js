@@ -2,7 +2,7 @@ const { hash, compare } = require("bcryptjs");
 require("dotenv").config();
 const userSchema = require("./schema");
 const randomstring = require("randomstring");
-const { sign } = require("jsonwebtoken");
+
 const {
   ForgotPasswordMail,
   SuccessForgotPasswordMail,
@@ -36,6 +36,13 @@ const signup = async (req, res) => {
 
       if (newUser) {
         generateToken(newUser._id, res);
+        await newUser.save();
+        return res.status(201).json({
+          message: "User Created Successfully",
+          _id: newUser._id,
+          name: newUser.name,
+          email: newUser.email,
+        });
       }
     } catch (error) {
       res.status(500).json({ message: error.message });
