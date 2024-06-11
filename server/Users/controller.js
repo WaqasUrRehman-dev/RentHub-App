@@ -2,7 +2,7 @@ const { hash, compare } = require("bcryptjs");
 require("dotenv").config();
 const userSchema = require("./schema");
 const randomstring = require("randomstring");
-// const { sign } = require("jsonwebtoken");
+
 const {
   ForgotPasswordMail,
   SuccessForgotPasswordMail,
@@ -20,8 +20,8 @@ const allusers = async (req, res) => {
 };
 
 const signup = async (req, res) => {
-  const { name, email, password } = req.body;
-  if (name && email && password) {
+  const { name, email, password, contactNo } = req.body;
+  if (name && email && password && contactNo) {
     try {
       const user = await userSchema.exists({ email });
 
@@ -31,17 +31,18 @@ const signup = async (req, res) => {
       const newUser = await userSchema.create({
         name,
         email,
+        contactNo,
         password: await hash(password, 10),
       });
 
       if (newUser) {
-        generateToken(newUser, res);
         await newUser.save();
         return res.status(201).json({
           message: "User Created Successfully",
           _id: newUser._id,
           name: newUser.name,
           email: newUser.email,
+          contactNumber: newUser.contactNo,
         });
       }
     } catch (error) {
@@ -65,8 +66,15 @@ const login = async (req, res) => {
           return res.status(400).json({ message: "Incorrect Password" });
         }
 
-        generateToken(checkUser, res);
+        const token = generateToken(checkUser);
+        console.log(token);
         return res
+          .cookie("jwt", token, {
+            httpOnly: true,
+            maxAge: 15 * 24 * 60 * 60 * 1000,
+            sameSite: "strict",
+            secure: process.env.NODE_ENV === "production" ? true : false,
+          })
           .status(200)
           .json({
             message: "Successfully Login",
@@ -74,7 +82,6 @@ const login = async (req, res) => {
             name: checkUser.name,
             email: checkUser.email,
           });
-       
       } else {
         res.status(404).json({ message: "User not found" });
       }
