@@ -9,6 +9,7 @@ const port = process.env.SERVER_PORT || 3000;
 const user_Route = require("./Users/router");
 const product_Route = require("./products/router");
 const message_Route = require("./message/router")
+const booking_Route = require("./reservationSystem/router")
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 
@@ -22,6 +23,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerJsDocs));
 app.use("/api", user_Route);
 app.use("/api", product_Route);
 app.use("/api", message_Route);
+app.use("/api", booking_Route);
 
 //Server
 app.listen(port, () => {

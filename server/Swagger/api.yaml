@@ -15,6 +15,10 @@ tags:
     description: Operations about User
   - name: Product
     description: Access our RentHub products
+  - name: Booking
+    description: Access our RentHub products
+  - name: Message
+    description: Message to the user
 
 paths:
 # SignUp API
@@ -355,7 +359,7 @@ paths:
         '500':
           description: Server error occurred
 
-# Product find by name API
+# Product find API
   /api/searchProduct:
     get:
       tags:
@@ -393,34 +397,7 @@ paths:
         '404':
           description: Product not found
         '500':
-          description: Server error occurred
-
-
-
-
-    get:
-      tags:
-        - Product
-      summary: Find Product by Location
-      produces:
-        - application/json
-      consumes:
-        - application/json
-      parameters:
-        - name: location
-          in: query
-          description: Location of the product
-          required: true
-          schema:
-            type: string
-            example: Mobile
-      responses:
-        '200':
-          description: Product Found
-        '404':
-          description: Product not found
-        '500':
-          description: Server error occurred
+          description: Server error occurred    
 
 # Get All Products
   /api/allProducts:
@@ -440,6 +417,112 @@ paths:
         '500':
           description: Server error occurred
 
+# Add Booking API
+  /api/createBooking:
+    post:
+      tags:
+        - Booking
+      summary: Add Booking
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: Create your Booking
+          schema:
+            $ref: "#/components/schemas/Booking"
+      required: true
+      responses:
+        '201':
+          description: Booking Added Successfully
+        '400':
+          description: Booking Already Exist
+        '422':
+          description: Required Field Missing
+        '500':
+          description: Internal server error
+
+# Get All Booking
+  /api/allBookings:
+    get:
+      tags:
+        - Booking
+      summary: Get All Bookings
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        '200':
+          description: All Bookings
+        '404':
+          description: No Booking Found
+        '500':
+          description: Server error occurred
+
+# Update Booking
+  /api/updateBookingStatus:
+    put:
+      tags:
+        - Booking
+      summary: Update Booking Status
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - name: id 
+          in: query
+          description: id of the booking
+          required: true
+          schema:
+            type: string
+            example: 5f7jbsauuw7432uni3nri
+        - in: body
+          name: Update your Booking Date
+          schema:
+            type: object
+            required:
+              - endDate
+            properties:
+              endDate:
+                type: Date
+                example: 2024-06-25
+      responses:
+        '201':
+          description: Booking Updated Successfully
+        '404':
+          description: Booking not found
+        '500':
+          description: Server error occurred
+
+# Delete booking 
+  /api/deleteBooking/:id:
+    delete:
+      tags:
+        - Booking
+      summary: Delete Booking
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - name: id 
+          in: query
+          description: id of the booking
+          required: true
+          schema:
+            type: string
+            example: 5f7jbsauuw7432uni3nri
+      responses:
+        '201':
+          description: Booking Deleted Successfully
+        '404':
+          description: Booking not found
+        '500':
+          description: Server error occurred
+      
 # Model
 components:
   schemas:
@@ -452,6 +535,9 @@ components:
         email:
           type: string
           example: "waqas@gmail.com"
+        contactNo:
+          type: string
+          example: "0300-1234567"
         password:
           type: string
           example: "12345678"
@@ -479,4 +565,17 @@ components:
         images:
           type: [string]
           example: ["https://www.google.com"]
+    Booking:
+      type: object
+      properties:
+        product:
+          type: string
+          example: "5f7jbsauuw7432uni3nri"
+        startDate:
+          type: Date
+          example: "2024-06-16"
+        endDate:
+          type: Date
+          example: "2020-06-20"
+        
       

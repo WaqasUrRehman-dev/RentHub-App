@@ -67,7 +67,7 @@ const login = async (req, res) => {
         }
 
         const token = generateToken(checkUser);
-        console.log(token);
+
         return res
           .cookie("jwt", token, {
             httpOnly: true,
@@ -81,6 +81,7 @@ const login = async (req, res) => {
             _id: checkUser._id,
             name: checkUser.name,
             email: checkUser.email,
+            token: token,
           });
       } else {
         res.status(404).json({ message: "User not found" });
