@@ -21,6 +21,7 @@ tags:
     description: Message to the user
 
 paths:
+# All About User
 # SignUp API
   /api/signup:
     post:
@@ -260,6 +261,7 @@ paths:
         '500':
           description: Server error occurred
 
+# All About Products
 # Add Product API
   /api/addProduct:
     post:
@@ -285,6 +287,24 @@ paths:
           description: Required Field Missing
         '500':
           description: Internal server error
+
+# Your Post API
+  /api/yourPost:
+    get:
+      tags:
+        - Product
+      summary: Get Your Post
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        '200':
+          description: Your Post
+        '404':
+          description: No Post Found
+        '500':
+          description: Server error occurred
 
 # Edit Product API
   /api/editProduct:
@@ -417,6 +437,7 @@ paths:
         '500':
           description: Server error occurred
 
+# All About Bookings
 # Add Booking API
   /api/createBooking:
     post:
@@ -521,8 +542,66 @@ paths:
         '404':
           description: Booking not found
         '500':
+          description: Server error occurred  
+
+#All About Messages
+# Send Message API
+  /api/sendMessage/:id:
+    post:
+      tags:
+        - Message
+      summary: Send Message
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - name: receiverId
+          in: query
+          description: id of the receiver
+          required: true
+          schema:
+            type: string
+            example: 5f7jbsauuw7432uni3nri
+        - in: body
+          name: Send Message
+          schema:
+            type: object
+            required:
+              - message
+            properties:
+              message:
+                type: string
+                example: Hello
+      required: true
+      responses:
+        '201':
+          description: Message Sent Successfully
+        '400':
+          description: Message not Sent
+        '422':
+          description: Required Field Missing
+        '500':
+          description: Internal server error 
+
+# Get All Messages
+  /api/getMessage/:id:
+    get:
+      tags:
+        - Message
+      summary: Get All Messages
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        '200':
+          description: All Messages
+        '404':
+          description: No Message Found
+        '500':
           description: Server error occurred
-      
+
 # Model
 components:
   schemas:
