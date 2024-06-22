@@ -16,7 +16,7 @@ router.delete("/deleteProduct", deleteProduct);
 
 router.put("/editProduct", updateProduct);
 
-router.post("/youPost", protectRoute, yourPost);
+router.post("/yourPost", protectRoute, yourPost);
 router.get("/allProducts", allProducts);
 router.get("/searchProduct", searchProduct);
 // router.get("/findByCategory", findByCategory);
