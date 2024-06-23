@@ -28,7 +28,7 @@ const createBooking = async (req, res) => {
       newBooking,
     });
   } catch (error) {
-    console.error("Error in createBooking: ", error);
+    
     return res.status(500).json({ message: error.message });
   }
 };
@@ -39,9 +39,9 @@ const allBookings = async (req, res) => {
     const bookings = await bookingSchema
       .find()
       .populate("product");
-    res.status(200).json(bookings);
+    return res.status(200).json(bookings);
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    return res.status(400).json({ error: err.message });
   }
 };
 
@@ -61,9 +61,9 @@ const updateBookingStatus = async (req, res) => {
     if (!booking) {
       return res.status(404).json({ error: "Booking not found" });
     }
-    res.status(200).json({ message: "Booking Updated Successfully", booking });
+    return res.status(200).json({ message: "Booking Updated Successfully", booking });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    return res.status(400).json({ error: err.message });
   }
 };
 
@@ -71,13 +71,13 @@ const updateBookingStatus = async (req, res) => {
 const deleteBooking = async (req, res) => {
   try {
     const booking = await bookingSchema.findOneAndDelete(req.params._id);
-    console.log(booking);
+    
     if (!booking) {
       return res.status(404).json({ error: "Booking not found" });
     }
-    res.status(200).json({ message: "Booking deleted successfully" });
+    return res.status(200).json({ message: "Booking deleted successfully" });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    return res.status(400).json({ error: err.message });
   }
 };
 

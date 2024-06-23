@@ -13,9 +13,9 @@ const generateToken = require("../utils/generateToken");
 const allusers = async (req, res) => {
   try {
     const users = await userSchema.find();
-    res.status(200).json({ message: "All Users", users });
+    return res.status(200).json({ message: "All Users", users });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    return res.status(400).json({ message: error.message });
   }
 };
 
@@ -46,10 +46,10 @@ const signup = async (req, res) => {
         });
       }
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      return res.status(500).json({ message: error.message });
     }
   } else {
-    res.status(422).json({ message: "Required Field Missing" });
+    return res.status(422).json({ message: "Required Field Missing" });
   }
 };
 
@@ -84,13 +84,13 @@ const login = async (req, res) => {
             token: token,
           });
       } else {
-        res.status(404).json({ message: "User not found" });
+        return res.status(404).json({ message: "User not found" });
       }
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      return res.status(500).json({ message: error.message });
     }
   } else {
-    res.status(403).json({ message: "Required Field Missing" });
+    return res.status(403).json({ message: "Required Field Missing" });
   }
 };
 
@@ -108,23 +108,23 @@ const editUser = async (req, res) => {
         .status(201)
         .json({ message: "user updated successfully", updateUser });
     } catch (error) {
-      res.status(500).send({ message: error.message });
+      return res.status(500).send({ message: error.message });
     }
   } else {
-    res.status(404).send("user not found");
+    return res.status(404).send("user not found");
   }
 };
 
 const forgotPass = async (req, res) => {
   const { email } = req.body;
   if (!email || email === "") {
-    res.status(400).send("Invalid request");
+    return res.status(400).send("Invalid request");
   }
 
   try {
     const user = await userSchema.findOne({ email }).select("-password");
     if (!user) {
-      res.status(404).send("user not found");
+      return res.status(404).send("user not found");
     }
     // const token = nanoid(32);
     const token = randomstring.generate();
@@ -132,9 +132,9 @@ const forgotPass = async (req, res) => {
     await ForgotPasswordMail(user.name, email, token, "Reset your Password");
     await Token({ user, token }).save();
 
-    res.status(200).json("Request Send Successfully");
+    return res.status(200).json("Request Send Successfully");
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -151,12 +151,12 @@ const updatePass = async (req, res) => {
       await userSchema.updateOne({ _id: user._id }, { password: hashedPass });
 
       await SuccessForgotPasswordMail(user.email);
-      res.status(201).json("Password Updated Succesfully");
+      return res.status(201).json("Password Updated Succesfully");
     } else {
-      res.status(400).json("Invalid or expired token");
+      return res.status(400).json("Invalid or expired token");
     }
   } catch (error) {
-    res.status(404).json("User not found");
+    return res.status(404).json("User not found");
   }
 };
 
@@ -169,23 +169,23 @@ const deleteuser = async (req, res) => {
         .status(200)
         .json({ message: "User Deleted Successfully", deleteUser });
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      return res.status(500).json({ message: error.message });
     }
   } else {
-    res.status(404).json({ message: "user not found" });
+    return res.status(404).json({ message: "user not found" });
   }
 };
 
 const searchUser = async (req, res) => {
   const { name } = req.query;
   if (!name) {
-    res.status(404).json({ message: "User not found" });
+    return res.status(404).json({ message: "User not found" });
   }
   try {
     const user = await userSchema.find({ name });
-    res.status(200).json({ message: "User Found", user });
+    return res.status(200).json({ message: "User Found", user });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -194,12 +194,12 @@ const searchByEmail = async (req, res) => {
   try {
     const user = await userSchema.findOne({ email });
     if (user) {
-      res.status(200).json({ message: "User Found", user });
+      return res.status(200).json({ message: "User Found", user });
     } else {
-      res.status(404).json({ message: "User not Found" });
+      return res.status(404).json({ message: "User not Found" });
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 

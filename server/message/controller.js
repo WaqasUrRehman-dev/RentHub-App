@@ -5,7 +5,6 @@ require("dotenv").config();
 const sendMessage = async (req, res) => {
   try {
     const { message } = req.body;
-    console.log(message);
 
     const { id: receiverId } = req.params;
     const senderId = req.user.id;
@@ -13,7 +12,6 @@ const sendMessage = async (req, res) => {
     let conversation = await conversationSchema.findOne({
       members: { $all: [senderId, receiverId] },
     });
-    console.log(conversation);
 
     if (!conversation) {
       conversation = await conversationSchema.create({
@@ -32,9 +30,8 @@ const sendMessage = async (req, res) => {
     }
 
     await Promise.all([newMessage.save(), conversation.save()]);
-    res.status(201).json(newMessage);
+    return res.status(201).json(newMessage);
   } catch (error) {
-    console.log("Error to sendMessage route: ", error.message);
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
@@ -50,14 +47,11 @@ const getMessage = async (req, res) => {
       })
       .populate("message");
 
-    console.log(conversation);
-
     if (!conversation) return res.status(200).json([]);
 
     return res.status(200).json(conversation.messages);
   } catch (error) {
-    console.log("Error to getMessages route: ", error.message);
-    res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 

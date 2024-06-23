@@ -15,34 +15,25 @@ const addProduct = async (req, res) => {
       type &&
       images
     ) {
-      const checkProduct = await productSchema.exists({ name });
+      const createProduct = await productSchema.create({
+        createdBy,
+        name,
+        price,
+        category,
+        description,
+        location,
+        type,
+        images,
+      });
 
-      if (checkProduct) {
-        return res.status(400).json({ message: "Product already exists" });
-      } else {
-        const createProduct = await productSchema.create({
-          createdBy,
-          name,
-          price,
-          category,
-          description,
-          location,
-          type,
-          images,
-        });
-
-        console.log(createProduct);
-
-        return res.status(201).json({
-          message: "Product created Successfully",
-          createProduct,
-        });
-      }
+      return res.status(201).json({
+        message: "Product created Successfully",
+        createProduct,
+      });
     } else {
       return res.status(422).json({ message: "Required Field Missing" });
     }
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ message: error.message });
   }
 };
@@ -51,10 +42,10 @@ const yourPost = async (req, res) => {
   const createdBy = req.user.id;
   try {
     const allProducts = await productSchema.find({ createdBy });
-    console.log(allProducts);
-    res.status(200).json({ message: "Your Post", allProducts });
+
+    return res.status(200).json({ message: "Your Post", allProducts });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -69,14 +60,14 @@ const updateProduct = async (req, res) => {
       { new: true }
     );
     if (updatedProduct) {
-      res
+      return res
         .status(201)
         .json({ message: "Product Updated Successfully", updatedProduct });
     } else {
-      res.status(404).json({ message: "Product not found" });
+      return res.status(404).json({ message: "Product not found" });
     }
   } catch (error) {
-    res.status(500).json({ message: "Internal Server Error" });
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
@@ -88,12 +79,12 @@ const deleteProduct = async (req, res) => {
     try {
       await productSchema.findOneAndDelete({ _id });
       const allProducts = await productSchema.find();
-      res.status(201).json({
+      return res.status(201).json({
         message: "Product Deleted Successfully",
         Products: allProducts,
       });
     } catch (error) {
-      res.status(500).json({ message: "Internal Server Error" });
+      return res.status(500).json({ message: "Internal Server Error" });
     }
   }
 };
@@ -101,18 +92,17 @@ const deleteProduct = async (req, res) => {
 const allProducts = async (req, res) => {
   try {
     const products = await productSchema.find();
-    res.status(200).json({ Products: products });
+    return res.status(200).json({ Products: products });
     if (!products) {
-      res.status(404).json({ message: "Product not found" });
+      return res.status(404).json({ message: "Product not found" });
     }
   } catch (error) {
-    res.status(500).json({ message: "Internal Server Error" });
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
 const searchProduct = async (req, res) => {
   const { name, category, location } = req.query;
-  console.log(category, location, name);
 
   try {
     let filter = {};
@@ -124,7 +114,7 @@ const searchProduct = async (req, res) => {
     } else if (location) {
       filter.location = { $regex: location, $options: "i" };
     } else {
-      res.status(404).json({ message: "Product not found" });
+      return res.status(404).json({ message: "Product not found" });
     }
 
     // Check if the filter is empty
@@ -140,7 +130,7 @@ const searchProduct = async (req, res) => {
       return res.status(404).json({ message: "Product not found" });
     }
   } catch (error) {
-    res.status(500).json({ message: "Internal Server Error" });
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
