@@ -12,14 +12,12 @@ const protectRoute = require("../middleware/protectRoute");
 
 router.post("/addProduct", protectRoute, addProduct);
 
-router.delete("/deleteProduct", deleteProduct);
+router.delete("/deleteProduct", protectRoute, deleteProduct);
 
-router.put("/editProduct", updateProduct);
+router.put("/editProduct", protectRoute, updateProduct);
 
 router.get("/yourPost", protectRoute, yourPost);
 router.get("/allProducts", allProducts);
 router.get("/searchProduct", searchProduct);
-// router.get("/findByCategory", findByCategory);
-// router.get("/findByLocation", findByLocation);
 
 module.exports = router;

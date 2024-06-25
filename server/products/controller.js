@@ -50,10 +50,11 @@ const yourPost = async (req, res) => {
 };
 
 const updateProduct = async (req, res) => {
-  const { _id, name, price, description, category, image1 } = req.body;
+  const { _id, name, price, description, category, images } = req.body;
+  const createdBy = req.user.id;
   try {
     const filter = { _id };
-    const update = { name, price, description, category, image1 };
+    const update = { name, price, description, category, images };
     const updatedProduct = await productSchema.findOneAndUpdate(
       filter,
       update,
@@ -62,7 +63,11 @@ const updateProduct = async (req, res) => {
     if (updatedProduct) {
       return res
         .status(201)
-        .json({ message: "Product Updated Successfully", updatedProduct });
+        .json({
+          message: "Product Updated Successfully",
+          createdBy,
+          updatedProduct,
+        });
     } else {
       return res.status(404).json({ message: "Product not found" });
     }
@@ -73,6 +78,7 @@ const updateProduct = async (req, res) => {
 
 const deleteProduct = async (req, res) => {
   const { _id } = req.body;
+  const createdBy = req.user.id;
   if (!_id) {
     res.status(404).json({ message: "Product not found" });
   } else {
@@ -82,6 +88,7 @@ const deleteProduct = async (req, res) => {
       return res.status(201).json({
         message: "Product Deleted Successfully",
         Products: allProducts,
+        CreatedBy: createdBy,
       });
     } catch (error) {
       return res.status(500).json({ message: "Internal Server Error" });
@@ -92,7 +99,7 @@ const deleteProduct = async (req, res) => {
 const allProducts = async (req, res) => {
   try {
     const products = await productSchema.find();
-    return res.status(200).json({ Products: products });
+    res.status(200).json({ Products: products });
     if (!products) {
       return res.status(404).json({ message: "Product not found" });
     }

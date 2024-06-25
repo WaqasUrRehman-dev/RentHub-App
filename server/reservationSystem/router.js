@@ -10,7 +10,7 @@ const protectRoute = require("../middleware/protectRoute");
 
 router.post("/createBooking", protectRoute, createBooking);
 router.get("/allBookings", allBookings);
-router.put("/updateBookingStatus", updateBookingStatus);
-router.delete("/deleteBooking/:id", deleteBooking);
+router.put("/updateBookingStatus", protectRoute, updateBookingStatus);
+router.delete("/deleteBooking/:id", protectRoute, deleteBooking);
 
 module.exports = router;
