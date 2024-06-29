@@ -594,6 +594,14 @@ paths:
         - application/json
       consumes:
         - application/json
+      parameters:
+        - name: userToChatId
+          in: query
+          description: id of the Chat
+          required: true
+          schema:
+            type: string
+            example: 5f7jbsauuw7432uni3nri
       responses:
         '200':
           description: All Messages

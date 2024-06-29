@@ -5,23 +5,22 @@ require("dotenv").config();
 const sendMessage = async (req, res) => {
   try {
     const { message } = req.body;
-
-    const { id: receiverId } = req.params;
+    const { receiverId: id } = req.query;
     const senderId = req.user.id;
 
     let conversation = await conversationSchema.findOne({
-      members: { $all: [senderId, receiverId] },
+      members: { $all: [senderId, id] },
     });
 
     if (!conversation) {
       conversation = await conversationSchema.create({
-        members: [senderId, receiverId],
+        members: [senderId, id],
       });
     }
 
     const newMessage = new messageSchema({
       senderId,
-      receiverId,
+      receiverId: id,
       message,
     });
 
@@ -38,18 +37,18 @@ const sendMessage = async (req, res) => {
 
 const getMessage = async (req, res) => {
   try {
-    const { id: userToChatId } = req.params;
+    const { userToChatId: id } = req.query;
     const senderId = req.user.id;
 
     const conversation = await conversationSchema
-      .findOne({
-        members: { $all: [senderId, userToChatId] },
+      .find({
+        members: { $all: [senderId, id] },
       })
-      .populate("message");
+      .populate("messages");
 
     if (!conversation) return res.status(200).json([]);
 
-    return res.status(200).json(conversation.messages);
+    return res.status(200).json(conversation);
   } catch (error) {
     return res.status(500).json({ error: "Internal Server Error" });
   }
