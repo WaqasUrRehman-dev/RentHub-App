@@ -610,6 +610,23 @@ paths:
         '500':
           description: Server error occurred
 
+# Get Sidebar Contact
+  /api/getAllContacts:
+    get:
+      tags:
+        - Message
+      summary: Get All Contacts for Sidebar
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        '200':
+          description: All Contacts
+        '404':
+          description: No Message Found
+        '500':
+          description: Server error occurred
 # Model
 components:
   schemas:

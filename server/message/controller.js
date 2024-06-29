@@ -37,21 +37,60 @@ const sendMessage = async (req, res) => {
 
 const getMessage = async (req, res) => {
   try {
-    const { userToChatId: id } = req.query;
-    const senderId = req.user.id;
+    const { userToChatId: id } = req.query; // ID of the user you want to chat with
+    const senderId = req.user.id; // Logged-in user ID
 
     const conversation = await conversationSchema
-      .find({
+      .findOne({
         members: { $all: [senderId, id] },
       })
-      .populate("messages");
+      .populate({
+        path: "messages",
+        populate: {
+          path: "senderId",
+          select: "name", // Fetch the sender's name
+        },
+      });
 
-    if (!conversation) return res.status(200).json([]);
+    if (!conversation) {
+      return res.status(200).json([]); // No conversation found
+    }
 
-    return res.status(200).json(conversation);
+    return res.status(200).json(conversation.messages);
   } catch (error) {
+    console.error("Error fetching messages:", error);
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
-module.exports = { sendMessage, getMessage };
+const getSidebarContact = async (req, res) => {
+  try {
+    const senderId = req.user.id;
+
+    // Find all conversations where the sender is a member
+    const conversations = await conversationSchema
+      .find({ members: senderId })
+      .populate("members", "name");
+      
+    if (!conversations) {
+      return res.status(200).json([]);
+    }
+
+    // Extract and filter unique members who are not the sender
+    const uniqueContacts = new Set();
+    conversations.forEach((conversation) => {
+      conversation.members.forEach((member) => {
+        if (member._id.toString() !== senderId) {
+          uniqueContacts.add(member.name);
+        }
+      });
+    });
+
+    return res.status(200).json([...uniqueContacts]);
+  } catch (error) {
+    console.error("Error fetching contacts:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+module.exports = { sendMessage, getMessage, getSidebarContact };
