@@ -1,4 +1,5 @@
 const productSchema = require("./schema");
+const userschema = require("../Users/schema");
 
 const addProduct = async (req, res) => {
   const { name, price, category, description, location, type, images } =
@@ -15,21 +16,26 @@ const addProduct = async (req, res) => {
       type &&
       images
     ) {
-      const createProduct = await productSchema.create({
-        createdBy,
-        name,
-        price,
-        category,
-        description,
-        location,
-        type,
-        images,
-      });
+      const user = await userschema.findById(createdBy).select("-password");
+      if (!user) {
+        return res.status(400).json({ message: "UnAuthorized User" });
+      } else {
+        const createProduct = await productSchema.create({
+          createdBy: user,
+          name,
+          price,
+          category,
+          description,
+          location,
+          type,
+          images,
+        });
 
-      return res.status(201).json({
-        message: "Product created Successfully",
-        createProduct,
-      });
+        return res.status(201).json({
+          message: "Product created Successfully",
+          createProduct,
+        });
+      }
     } else {
       return res.status(422).json({ message: "Required Field Missing" });
     }
@@ -61,13 +67,11 @@ const updateProduct = async (req, res) => {
       { new: true }
     );
     if (updatedProduct) {
-      return res
-        .status(201)
-        .json({
-          message: "Product Updated Successfully",
-          createdBy,
-          updatedProduct,
-        });
+      return res.status(201).json({
+        message: "Product Updated Successfully",
+        createdBy,
+        updatedProduct,
+      });
     } else {
       return res.status(404).json({ message: "Product not found" });
     }

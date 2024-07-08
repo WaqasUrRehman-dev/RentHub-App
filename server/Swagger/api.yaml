@@ -339,9 +339,9 @@ paths:
               category:
                 type: string
                 example: Mobile
-              image:
-                type: string
-                example: https://www.google.com
+              images:
+                type: [string]
+                example: ["https://www.google.com", "https://www.google.com"]
       responses:
         '201':
           description: Product Updated Successfully
