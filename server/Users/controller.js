@@ -20,7 +20,7 @@ const allusers = async (req, res) => {
 };
 
 const signup = async (req, res) => {
-  const { name, email, password, contactNo } = req.body;
+  const { name, email, password, contactNo, gender } = req.body;
   if (name && email && password && contactNo) {
     try {
       const user = await userSchema.exists({ email });
@@ -28,21 +28,23 @@ const signup = async (req, res) => {
       if (user) {
         return res.status(400).json({ message: "User already exists" });
       }
+
+      const boyProfilePic = `https://avatar.iran.liara.run/public/boy?name=${name}`;
+      const girlProfilePic = `https://avatar.iran.liara.run/public/girl?name=${name}`;
       const newUser = await userSchema.create({
         name,
         email,
         contactNo,
         password: await hash(password, 10),
+        gender,
+        profilePic: gender === "male" ? boyProfilePic : girlProfilePic,
       });
 
       if (newUser) {
         await newUser.save();
         return res.status(201).json({
           message: "User Created Successfully",
-          _id: newUser._id,
-          name: newUser.name,
-          email: newUser.email,
-          contactNumber: newUser.contactNo,
+          newUser,
         });
       }
     } catch (error) {
@@ -81,6 +83,8 @@ const login = async (req, res) => {
             _id: checkUser._id,
             name: checkUser.name,
             email: checkUser.email,
+            gender: checkUser.gender,
+            profilePic: checkUser.profilePic,
             token: token,
           });
       } else {

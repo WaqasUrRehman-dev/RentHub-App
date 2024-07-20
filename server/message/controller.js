@@ -5,22 +5,22 @@ require("dotenv").config();
 const sendMessage = async (req, res) => {
   try {
     const { message } = req.body;
-    const { receiverId: id } = req.query;
+    const { receiverId } = req.query;
     const senderId = req.user.id;
 
     let conversation = await conversationSchema.findOne({
-      members: { $all: [senderId, id] },
+      members: { $all: [senderId, receiverId] },
     });
 
     if (!conversation) {
       conversation = await conversationSchema.create({
-        members: [senderId, id],
+        members: [senderId, receiverId],
       });
     }
 
     const newMessage = new messageSchema({
       senderId,
-      receiverId: id,
+      receiverId,
       message,
     });
 
@@ -36,10 +36,9 @@ const sendMessage = async (req, res) => {
 };
 
 const getMessage = async (req, res) => {
+  const { userToChatId: id } = req.query; // ID of the user you want to chat with
+  const senderId = req.user.id; // Logged-in user ID
   try {
-    const { userToChatId: id } = req.query; // ID of the user you want to chat with
-    const senderId = req.user.id; // Logged-in user ID
-
     const conversation = await conversationSchema
       .findOne({
         members: { $all: [senderId, id] },
@@ -47,8 +46,8 @@ const getMessage = async (req, res) => {
       .populate({
         path: "messages",
         populate: {
-          path: "senderId",
-          select: "name", // Fetch the sender's name
+          path: "receiverId",
+          select: "name timestamp messages profilePic", // Fetch the sender's name
         },
       });
 
@@ -58,8 +57,56 @@ const getMessage = async (req, res) => {
 
     return res.status(200).json(conversation.messages);
   } catch (error) {
-    console.error("Error fetching messages:", error);
     return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+const getLastMessageDetails = async (req, res) => {
+  try {
+    const { userId } = req.query;
+    const currentUserId = req.user.id; 
+    
+    const lastMessage = await messageSchema
+      .findOne({
+        $or: [
+          { senderId: currentUserId, receiverId: userId },
+          { senderId: userId, receiverId: currentUserId },
+        ],
+      })
+      .sort({ timestamp: -1 }) 
+      .populate("senderId receiverId")
+      .select("-password");
+
+    if (!lastMessage) {
+      return res.status(404).json({ message: "No messages found" });
+    }
+
+    const otherUser =
+      lastMessage.senderId._id.toString() === currentUserId
+        ? lastMessage.receiverId
+        : lastMessage.senderId;
+
+    const utcDate = new Date(lastMessage.timestamp);
+    const offset = 5 * 60; // UTC+5:00 offset in minutes
+    const localTime = new Date(utcDate.getTime() + offset * 60000);
+
+    const formattedTime = localTime.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+
+    const messageDetails = {
+      id: otherUser._id,
+      name: otherUser.name,
+      lastMessage: lastMessage.message,
+      timestamp: formattedTime,
+      profilePic: otherUser.profilePic,
+    };
+
+    return res.status(200).json(messageDetails);
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -67,16 +114,14 @@ const getSidebarContact = async (req, res) => {
   try {
     const senderId = req.user.id;
 
-    // Find all conversations where the sender is a member
     const conversations = await conversationSchema
       .find({ members: senderId })
       .populate("members", "name");
-      
+
     if (!conversations) {
       return res.status(200).json([]);
     }
 
-    // Extract and filter unique members who are not the sender
     const uniqueContacts = new Set();
     conversations.forEach((conversation) => {
       conversation.members.forEach((member) => {
@@ -88,9 +133,13 @@ const getSidebarContact = async (req, res) => {
 
     return res.status(200).json([...uniqueContacts]);
   } catch (error) {
-    console.error("Error fetching contacts:", error);
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
-module.exports = { sendMessage, getMessage, getSidebarContact };
+module.exports = {
+  sendMessage,
+  getMessage,
+  getSidebarContact,
+  getLastMessageDetails,
+};

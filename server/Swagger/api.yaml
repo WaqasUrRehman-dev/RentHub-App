@@ -627,6 +627,33 @@ paths:
           description: No Message Found
         '500':
           description: Server error occurred
+
+# get Last Message
+  /api/getLastMessage:
+    get:
+      tags:
+        - Message
+      summary: Get Last Message
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - name: userId
+          in: query
+          description: id of the receiver
+          required: true
+          schema:
+            type: string
+            example: 5f7jbsauuw7432uni3nri
+      responses:
+        '200':
+          description: Last Messages
+        '404':
+          description: No Message Found
+        '500':
+          description: Server error occurred
+
 # Model
 components:
   schemas:
@@ -645,6 +672,9 @@ components:
         password:
           type: string
           example: "12345678"
+        gender:
+          type: string
+          example: "male/female"
     Products:
       type: object
       properties:

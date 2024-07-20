@@ -47,9 +47,15 @@ const addProduct = async (req, res) => {
 const yourPost = async (req, res) => {
   const createdBy = req.user.id;
   try {
+
+    const user = await userschema.findById(createdBy).select("-password")
+    if (!user) {
+      return res.status(400).json({ message: "UnAuthorized User" });
+    }
+
     const allProducts = await productSchema.find({ createdBy });
 
-    return res.status(200).json({ message: "Your Post", allProducts });
+    return res.status(200).json({ message: "Your Post", allProducts, user });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
