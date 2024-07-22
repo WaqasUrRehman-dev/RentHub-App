@@ -37,6 +37,7 @@ const sendMessage = async (req, res) => {
 
 const getMessage = async (req, res) => {
   const { userToChatId: id } = req.query; // ID of the user you want to chat with
+
   const senderId = req.user.id; // Logged-in user ID
   try {
     const conversation = await conversationSchema
@@ -55,25 +56,33 @@ const getMessage = async (req, res) => {
       return res.status(200).json([]); // No conversation found
     }
 
-    return res.status(200).json(conversation.messages);
+    return res.status(200).json({ messages: conversation.messages });
   } catch (error) {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
-const getLastMessageDetails = async (req, res) => {
+const getSidebarContact = async (req, res) => {
   try {
     const { userId } = req.query;
-    const currentUserId = req.user.id; 
-    
+    const senderId = req.user.id;
+
+    const conversations = await conversationSchema
+      .find({ members: senderId })
+      .populate("members", "name");
+
+    if (!conversations) {
+      return res.status(200).json([]);
+    }
+
     const lastMessage = await messageSchema
       .findOne({
         $or: [
-          { senderId: currentUserId, receiverId: userId },
-          { senderId: userId, receiverId: currentUserId },
+          { senderId: senderId, receiverId: userId },
+          { senderId: userId, receiverId: senderId },
         ],
       })
-      .sort({ timestamp: -1 }) 
+      .sort({ timestamp: -1 })
       .populate("senderId receiverId")
       .select("-password");
 
@@ -82,7 +91,7 @@ const getLastMessageDetails = async (req, res) => {
     }
 
     const otherUser =
-      lastMessage.senderId._id.toString() === currentUserId
+      lastMessage.senderId._id.toString() === senderId
         ? lastMessage.receiverId
         : lastMessage.senderId;
 
@@ -98,29 +107,10 @@ const getLastMessageDetails = async (req, res) => {
 
     const messageDetails = {
       id: otherUser._id,
-      name: otherUser.name,
       lastMessage: lastMessage.message,
       timestamp: formattedTime,
       profilePic: otherUser.profilePic,
     };
-
-    return res.status(200).json(messageDetails);
-  } catch (error) {
-    return res.status(500).json({ message: "Internal server error", error });
-  }
-};
-
-const getSidebarContact = async (req, res) => {
-  try {
-    const senderId = req.user.id;
-
-    const conversations = await conversationSchema
-      .find({ members: senderId })
-      .populate("members", "name");
-
-    if (!conversations) {
-      return res.status(200).json([]);
-    }
 
     const uniqueContacts = new Set();
     conversations.forEach((conversation) => {
@@ -131,7 +121,7 @@ const getSidebarContact = async (req, res) => {
       });
     });
 
-    return res.status(200).json([...uniqueContacts]);
+    return res.status(200).json([...uniqueContacts, messageDetails]);
   } catch (error) {
     return res.status(500).json({ error: "Internal Server Error" });
   }
@@ -141,5 +131,4 @@ module.exports = {
   sendMessage,
   getMessage,
   getSidebarContact,
-  getLastMessageDetails,
 };

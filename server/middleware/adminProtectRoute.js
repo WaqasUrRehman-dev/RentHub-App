@@ -10,7 +10,6 @@ const adminProtectRoute = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await userSchema.findById(decoded.id);
-    console.log(user)
     if (!user || user.role !== "admin") {
       return res.status(403).json({ message: "Forbidden - Admin Only" });
     }

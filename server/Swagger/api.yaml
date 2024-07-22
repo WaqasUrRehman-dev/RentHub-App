@@ -620,24 +620,6 @@ paths:
         - application/json
       consumes:
         - application/json
-      responses:
-        '200':
-          description: All Contacts
-        '404':
-          description: No Message Found
-        '500':
-          description: Server error occurred
-
-# get Last Message
-  /api/getLastMessage:
-    get:
-      tags:
-        - Message
-      summary: Get Last Message
-      produces:
-        - application/json
-      consumes:
-        - application/json
       parameters:
         - name: userId
           in: query
@@ -648,7 +630,7 @@ paths:
             example: 5f7jbsauuw7432uni3nri
       responses:
         '200':
-          description: Last Messages
+          description: All Contacts
         '404':
           description: No Message Found
         '500':
