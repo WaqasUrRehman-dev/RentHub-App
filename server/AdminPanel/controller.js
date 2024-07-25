@@ -18,7 +18,7 @@ const allUsers = async (req, res) => {
 };
 
 const deleteUser = async (req, res) => {
-  const name = req.params;
+  const name = req.query;
   try {
     const user = await userSchema.findOneAndDelete({ name });
     return res.status(200).json("User deleted Succesfully", user);
@@ -36,4 +36,23 @@ const allProducts = async (req, res) => {
   }
 };
 
-module.exports = { allUsers, allProducts, deleteUser };
+const delete_Product = async (req, res) => {
+  const { _id } = req.query;
+  if (!_id) {
+    res.status(404).json({ message: "Product not found" });
+  } else {
+    try {
+      await productSchema.findOneAndDelete({ _id });
+      const allProducts = await productSchema.find();
+      return res.status(201).json({
+        message: "Product Deleted Successfully",
+        Products: allProducts,
+        CreatedBy: createdBy,
+      });
+    } catch (error) {
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
+  }
+};
+
+module.exports = { allUsers, allProducts, deleteUser, delete_Product };

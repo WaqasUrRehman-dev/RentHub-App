@@ -19,6 +19,8 @@ tags:
     description: Access our RentHub products
   - name: Message
     description: Message to the user
+  - name: Admin
+    description: Admin Control Pannel
 
 paths:
 # All About User
@@ -600,8 +602,11 @@ paths:
           description: id of the Chat
           required: true
           schema:
-            type: string
-            example: 5f7jbsauuw7432uni3nri
+            type: object
+            properties:
+              _id:
+                type: string
+                example: 5f7jbsauuw7432uni3nri
       responses:
         '200':
           description: All Messages
@@ -635,6 +640,97 @@ paths:
           description: No Message Found
         '500':
           description: Server error occurred
+
+
+# Admin Pannel
+# Get all users
+  /api/allUsers:
+    get:
+      tags:
+        - Admin
+      Summary: Only admin can get all users 
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        '200':
+          description: All Users
+        '404':
+          description: No user Found
+        '500':
+          description: Server error occurred
+
+# Get all Products
+  /api/all-Products:
+    get:
+      tags:
+        - Admin
+      summary: Only admin can get all products
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        '200':
+          description: All Products
+        '404':
+          description: No product Found
+        '500':
+          description: Server error occurred
+ 
+# delete user
+  /api/deleteUsers:
+    delete:
+      tags:
+        - Admin
+      summary: Delete User Account
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - name: name
+          in: query
+          description: name of the user
+          required: true
+          schema:
+            type: string
+            example: john doe
+      responses:
+        '201':
+          description: User Deleted Successfully
+        '404':
+          description: User not found
+        '500':
+          description: Server error occurred
+
+# delete Product
+  /api/delete-product:
+    delete:
+      tags:
+        - Admin
+      summary: Only admin can delete product
+      produces:
+        - application/json
+      consumes:
+        -application/json
+      parameters:
+        - name: id 
+          in: query
+          description: id of the Product
+          required: true
+          schema:
+            type: string
+            example: 5f7jbsauuw7432uni3nr
+      responses:
+        '201':
+          description: Product Deleted Successfully
+        '404':
+          description: Product not found
+        '500':
+          description: Server error occurred
+
 
 # Model
 components:
