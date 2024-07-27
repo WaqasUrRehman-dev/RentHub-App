@@ -6,8 +6,9 @@ const userSchema = new Schema({
   contactNo: { type: String, required: true },
   password: { type: String, required: true },
   role: { type: String, default: "user" },
-  gender: { type: String, required: true, enum: ["male", "female"] },
+  gender: { type: String, default: "male" },
   profilePic: { type: String, default: "" },
+  address: { type: String, default: "street no 2 malir, karachi" },
 });
 
 const userModel = model("user", userSchema);

@@ -9,12 +9,15 @@ const {
   deleteuser,
   searchUser,
   searchByEmail,
+  userProfile,
 } = require("./controller");
+const protectRoute = require("../middleware/protectRoute");
 const router = express.Router();
 
 router.get("/all-users", allusers);
 router.get("/search-user/:name", searchUser);
 router.get("/search-user-email/:email", searchByEmail);
+router.get("/userProfile", protectRoute, userProfile)
 
 router.post("/login", login);
 router.post("/signup", signup);

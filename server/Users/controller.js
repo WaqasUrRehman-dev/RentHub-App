@@ -2,7 +2,6 @@ const { hash, compare } = require("bcryptjs");
 require("dotenv").config();
 const userSchema = require("./schema");
 const randomstring = require("randomstring");
-
 const {
   ForgotPasswordMail,
   SuccessForgotPasswordMail,
@@ -20,7 +19,7 @@ const allusers = async (req, res) => {
 };
 
 const signup = async (req, res) => {
-  const { name, email, password, contactNo, gender } = req.body;
+  const { name, email, password, contactNo } = req.body;
   if (name && email && password && contactNo) {
     try {
       const user = await userSchema.exists({ email });
@@ -29,15 +28,11 @@ const signup = async (req, res) => {
         return res.status(400).json({ message: "User already exists" });
       }
 
-      const boyProfilePic = `https://avatar.iran.liara.run/public/boy?name=${name}`;
-      const girlProfilePic = `https://avatar.iran.liara.run/public/girl?name=${name}`;
       const newUser = await userSchema.create({
         name,
         email,
         contactNo,
         password: await hash(password, 10),
-        gender,
-        profilePic: gender === "male" ? boyProfilePic : girlProfilePic,
       });
 
       if (newUser) {
@@ -95,6 +90,31 @@ const login = async (req, res) => {
     }
   } else {
     return res.status(403).json({ message: "Required Field Missing" });
+  }
+};
+
+const userProfile = async (req, res) => {
+  const userId = req.user.id;
+
+  try {
+    const user = await userSchema
+      .findById(userId)
+      .select("-password -contactNo");
+
+    if (user) {
+      return res.status(200).json({
+        message: "User details",
+        name: user.name,
+        email: user.email,
+        gender: user.gender,
+        profilePic: user.profilePic,
+        address: user.address,
+      });
+    } else {
+      return res.status(404).json({ message: "user not found" });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -211,6 +231,7 @@ module.exports = {
   allusers,
   signup,
   login,
+  userProfile,
   editUser,
   forgotPass,
   updatePass,

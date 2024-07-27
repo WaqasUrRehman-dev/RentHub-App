@@ -29,7 +29,7 @@ app.use("/api", booking_Route);
 
 //Server
 app.listen(port, () => {
-  connectDB(process.env.MONGO_URL)
+  connectDB()
     .then(() => {
       console.log(`App listening on port ${port}`);
     })
