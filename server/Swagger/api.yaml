@@ -698,7 +698,7 @@ paths:
           description: Server error occurred
  
 # delete user
-  /api/deleteUsers:
+  /api/deleteUsers/:id:
     delete:
       tags:
         - Admin
@@ -708,13 +708,13 @@ paths:
       consumes:
         - application/json
       parameters:
-        - name: name
+        - name: id
           in: query
-          description: name of the user
+          description: id of the user
           required: true
           schema:
             type: string
-            example: john doe
+            example: 5f7jbsauuw7432uni3nr
       responses:
         '201':
           description: User Deleted Successfully
@@ -724,7 +724,7 @@ paths:
           description: Server error occurred
 
 # delete Product
-  /api/delete-product:
+  /api/delete-product/:id:
     delete:
       tags:
         - Admin
@@ -749,6 +749,59 @@ paths:
         '500':
           description: Server error occurred
 
+# Users Length
+  /api/users-length:
+    get:
+      tags:
+        - Admin
+      summary: Get Users Length
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        '200':
+          description: Total Users
+        '404':
+          description: No User Found
+        '500':
+          description: Server error occurred
+
+# Products Length
+  /api/products-length:
+    get:
+      tags:
+        - Admin
+      summary: Get Products Length
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        '200':
+          description: Total Products
+        '404':
+          description: No Product Found
+        '500':
+          description: Server error occurred
+
+# All Bookings
+  /api/all-bookings:
+    get:
+      tags:
+        - Admin
+      summary: Get All Bookings
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        '200':
+          description: All Bookings
+        '404':
+          description: No Booking Found
+        '500':
+          description: Server error occurred
 
 # Model
 components:
