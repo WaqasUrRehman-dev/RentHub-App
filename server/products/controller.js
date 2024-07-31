@@ -47,8 +47,7 @@ const addProduct = async (req, res) => {
 const yourPost = async (req, res) => {
   const createdBy = req.user.id;
   try {
-
-    const user = await userschema.findById(createdBy).select("-password")
+    const user = await userschema.findById(createdBy).select("-password");
     if (!user) {
       return res.status(400).json({ message: "UnAuthorized User" });
     }
@@ -87,18 +86,24 @@ const updateProduct = async (req, res) => {
 };
 
 const deleteProduct = async (req, res) => {
-  const { _id } = req.body;
-  const createdBy = req.user.id;
-  if (!_id) {
-    res.status(404).json({ message: "Product not found" });
-  } else {
+
+  const { id } = req.query;
+  const userId = req.user.id;
+
+  if (!id) {
+    res.status(404).json({ message: "ProductID is required" });
+  } 
+  else {
     try {
-      await productSchema.findOneAndDelete({ _id });
+      const product = await productSchema.findByIdAndDelete(id);
+      if (!product) {
+        return res.status(404).json({ message: "Product not found" });
+      }
       const allProducts = await productSchema.find();
       return res.status(201).json({
         message: "Product Deleted Successfully",
         Products: allProducts,
-        CreatedBy: createdBy,
+        CreatedBy: userId,
       });
     } catch (error) {
       return res.status(500).json({ message: "Internal Server Error" });

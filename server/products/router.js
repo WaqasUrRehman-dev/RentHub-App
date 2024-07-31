@@ -11,11 +11,8 @@ const {
 const protectRoute = require("../middleware/protectRoute");
 
 router.post("/addProduct", protectRoute, addProduct);
-
-router.delete("/deleteProduct", protectRoute, deleteProduct);
-
+router.delete("/deleteProduct/:id", protectRoute, deleteProduct);
 router.put("/editProduct", protectRoute, updateProduct);
-
 router.get("/yourPost", protectRoute, yourPost);
 router.get("/allProducts", allProducts);
 router.get("/searchProduct", searchProduct);

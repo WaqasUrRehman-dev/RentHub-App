@@ -23,6 +23,7 @@ tags:
     description: Admin Control Pannel
 
 paths:
+
 # All About User
 # SignUp API
   /api/signup:
@@ -282,6 +283,7 @@ paths:
           description: Server error occurred
 
 # All About Products
+
 # Add Product API
   /api/addProduct:
     post:
@@ -371,7 +373,7 @@ paths:
           description: Server error occurred
 
 # Delete Product API
-  /api/deleteProduct:
+  /api/deleteProduct/:id:
     delete:
       tags:
         - Product
@@ -381,16 +383,13 @@ paths:
       consumes:
         - application/json
       parameters:
-        - in: body
-          name: Delete Product
+        - name: id 
+          in: query
+          description: id of the Product
+          required: true
           schema:
-            type: object
-            required:
-              - _id
-            properties:
-              _id:
-                type: string
-                example: 5f7jbsauuw7432uni3nri
+            type: string
+            example: 5f7jbsauuw7432uni3nr
       responses:
         '201':
           description: Product Deleted Successfully
