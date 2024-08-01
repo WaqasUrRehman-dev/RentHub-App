@@ -1,5 +1,6 @@
 const messageSchema = require("./schema");
 const conversationSchema = require("../model/conversation");
+const { mongoose } = require("mongoose");
 require("dotenv").config();
 
 const sendMessage = async (req, res) => {
@@ -36,9 +37,9 @@ const sendMessage = async (req, res) => {
 };
 
 const getMessage = async (req, res) => {
-  const { userToChatId: id } = req.query; // ID of the user you want to chat with
+  const { userToChatId: id } = req.query;
 
-  const senderId = req.user.id; // Logged-in user ID
+  const senderId = req.user.id;
   try {
     const conversation = await conversationSchema
       .findOne({
@@ -65,63 +66,66 @@ const getMessage = async (req, res) => {
 const getSidebarContact = async (req, res) => {
   try {
     const { userId } = req.query;
-    const senderId = req.user.id;
+    const senderDetails = await messageSchema.aggregate([
+      {
+        $match: {
+          $or: [
+            { receiverId: new mongoose.Types.ObjectId(userId) },
+            { senderId: new mongoose.Types.ObjectId(userId) },
+          ],
+        },
+      },
+      { $sort: { timestamp: 1 } },
+      {
+        $group: {
+          _id: {
+            senderId: {
+              $cond: {
+                if: {
+                  $eq: ["$senderId", new mongoose.Types.ObjectId(userId)],
+                },
+                then: "$receiverId",
+                else: "$senderId",
+              },
+            },
+            receiverId: {
+              $cond: {
+                if: {
+                  $eq: ["$senderId", new mongoose.Types.ObjectId(userId)],
+                },
+                then: "$senderId",
+                else: "$receiverId",
+              },
+            },
+          },
+          lastMessage: { $last: "$message" },
+          lastTimestamp: { $last: "$timestamp" },
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "_id.senderId",
+          foreignField: "_id",
+          as: "senderDetails",
+        },
+      },
+      { $unwind: "$senderDetails" },
+      {
+        $project: {
+          _id: 0,
+          senderId: "$_id.senderId",
+          receiverId: "$_id.receiverId",
 
-    const conversations = await conversationSchema
-      .find({ members: senderId })
-      .populate("members", "name");
+          lastMessage: 1,
+          lastTimestamp: 1,
+          "senderDetails.name": 1,
+          "senderDetails.profilePic": 1,
+        },
+      },
+    ]);
 
-    if (!conversations) {
-      return res.status(200).json([]);
-    }
-
-    const lastMessage = await messageSchema
-      .findOne({
-        $or: [
-          { senderId: senderId, receiverId: userId },
-          { senderId: userId, receiverId: senderId },
-        ],
-      })
-      .sort({ timestamp: -1 })
-      .populate("senderId receiverId")
-      .select("-password");
-
-    if (!lastMessage) {
-      return res.status(404).json({ message: "No messages found" });
-    }
-
-    const otherUser =
-      lastMessage.senderId._id.toString() === senderId
-        ? lastMessage.receiverId
-        : lastMessage.senderId;
-
-    const utcDate = new Date(lastMessage.timestamp);
-    const offset = 5 * 60; // UTC+5:00 offset in minutes
-    const localTime = new Date(utcDate.getTime() + offset * 60000);
-
-    const formattedTime = localTime.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
-
-    const messageDetails = {
-      id: otherUser._id,
-      lastMessage: lastMessage.message,
-      timestamp: formattedTime,
-      profilePic: otherUser.profilePic,
-    };
-
-    const uniqueContacts = new Set();
-    conversations.forEach((conversation) => {
-      conversation.members.forEach((member) => {
-        if (member._id.toString() !== senderId) {
-          uniqueContacts.add(member.name);
-        }
-      });
-    });
-
-    return res.status(200).json([...uniqueContacts, messageDetails]);
+    return res.status(200).json({ message: senderDetails });
   } catch (error) {
     return res.status(500).json({ error: "Internal Server Error" });
   }

@@ -80,6 +80,7 @@ const login = async (req, res) => {
             email: checkUser.email,
             gender: checkUser.gender,
             profilePic: checkUser.profilePic,
+            address: checkUser.address,
             token: token,
           });
       } else {
@@ -119,23 +120,24 @@ const userProfile = async (req, res) => {
 };
 
 const editUser = async (req, res) => {
-  const { _id, name, email } = req.body;
+  try {
+    const { name, gender, contactNo, profilePic, address } = req.body;
+    const userId = req.user.id;
 
-  if (_id) {
-    try {
-      const filter = { _id };
-      const update = { name, email };
-      const updateUser = await userSchema.findOneAndUpdate(filter, update, {
+    if (userId) {
+      const filter = userId;
+      const update = { name, gender, contactNo, profilePic, address };
+      const updateUser = await userSchema.findByIdAndUpdate(filter, update, {
         new: true,
       });
       res
         .status(201)
         .json({ message: "user updated successfully", updateUser });
-    } catch (error) {
-      return res.status(500).send({ message: error.message });
+    } else {
+      return res.status(404).send("user not found");
     }
-  } else {
-    return res.status(404).send("user not found");
+  } catch (error) {
+    return res.status(500).send({ message: error.message });
   }
 };
 

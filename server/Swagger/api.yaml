@@ -119,18 +119,22 @@ paths:
           name: Update User Information
           schema:
             type: object
-            required:
-              - _id
             properties:
-              _id:
-                type: string
-                example: 5f7jbsauuw7432uni3nri
               name:
                 type: string
-                example: Waqas
-              email: 
+                example: john doe
+              contactNo:
                 type: string
-                example: johndoe@gmail.com   
+                example: 0123-4567890
+              gender:
+                type: string
+                example: male
+              profilePic:
+                type: string
+                example: https://avatar.iran.liara.run/public/boy
+              address: 
+                type: string
+                example: Karachi, Pkistan   
       responses:
         '201':
           description: user updated successfully
