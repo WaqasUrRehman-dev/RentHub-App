@@ -1,12 +1,11 @@
 const { hash, compare } = require("bcryptjs");
 require("dotenv").config();
 const userSchema = require("./schema");
-const randomstring = require("randomstring");
 const {
   ForgotPasswordMail,
   SuccessForgotPasswordMail,
 } = require("../model/email");
-const Token = require("../Token/schema");
+const tokenSchema = require("../Token/schema");
 const generateToken = require("../utils/generateToken");
 
 const allusers = async (req, res) => {
@@ -58,31 +57,29 @@ const login = async (req, res) => {
       const checkUser = await userSchema.findOne({ email });
       if (checkUser) {
         const decryptPass = await compare(password, checkUser.password);
-
-        if (!decryptPass && !email == checkUser.email) {
+        if (!decryptPass) {
           return res.status(400).json({ message: "Incorrect Password" });
+        } else {
+          const token = generateToken(checkUser);
+          return res
+            .cookie("jwt", token, {
+              httpOnly: true,
+              maxAge: 15 * 24 * 60 * 60 * 1000,
+              sameSite: "strict",
+              secure: process.env.NODE_ENV === "production" ? true : false,
+            })
+            .status(200)
+            .json({
+              message: "Successfully Login",
+              _id: checkUser._id,
+              name: checkUser.name,
+              email: checkUser.email,
+              gender: checkUser.gender,
+              profilePic: checkUser.profilePic,
+              address: checkUser.address,
+              token: token,
+            });
         }
-
-        const token = generateToken(checkUser);
-
-        return res
-          .cookie("jwt", token, {
-            httpOnly: true,
-            maxAge: 15 * 24 * 60 * 60 * 1000,
-            sameSite: "strict",
-            secure: process.env.NODE_ENV === "production" ? true : false,
-          })
-          .status(200)
-          .json({
-            message: "Successfully Login",
-            _id: checkUser._id,
-            name: checkUser.name,
-            email: checkUser.email,
-            gender: checkUser.gender,
-            profilePic: checkUser.profilePic,
-            address: checkUser.address,
-            token: token,
-          });
       } else {
         return res.status(404).json({ message: "User not found" });
       }
@@ -91,6 +88,15 @@ const login = async (req, res) => {
     }
   } else {
     return res.status(403).json({ message: "Required Field Missing" });
+  }
+};
+
+const logOut = async (req, res) => {
+  try {
+    res.cookie("jwt", "", { maxAge: 0 });
+    res.status(200).json({ message: "Logged Out Successfully" });
+  } catch (error) {
+    return res.status(500).json("Internal server error");
   }
 };
 
@@ -150,13 +156,12 @@ const forgotPass = async (req, res) => {
   try {
     const user = await userSchema.findOne({ email }).select("-password");
     if (!user) {
-      return res.status(404).send("user not found");
+      return res.status(404).send("user not found or please give a valid gmail address");
     }
-    // const token = nanoid(32);
-    const token = randomstring.generate();
-    // send email to user with token
+    const token = Math.floor(100000 + Math.random() * 999999);
+
     await ForgotPasswordMail(user.name, email, token, "Reset your Password");
-    await Token({ user, token }).save();
+    await tokenSchema({ user, token }).save();
 
     return res.status(200).json("Request Send Successfully");
   } catch (error) {
@@ -165,14 +170,14 @@ const forgotPass = async (req, res) => {
 };
 
 const updatePass = async (req, res) => {
-  const { tokenId, password } = req.body;
+  const { token, password } = req.body;
   try {
-    const token = await Token.findOne({ token: tokenId })
+    const userToken = await tokenSchema
+      .findOne({ token })
       .populate("user")
       .select("-password");
     if (token) {
-      const user = await userSchema.findById(token.user._id);
-
+      const user = await userSchema.findById(userToken.user._id);
       const hashedPass = await hash(password, 10);
       await userSchema.updateOne({ _id: user._id }, { password: hashedPass });
 
@@ -233,6 +238,7 @@ module.exports = {
   allusers,
   signup,
   login,
+  logOut,
   userProfile,
   editUser,
   forgotPass,
