@@ -156,7 +156,9 @@ const forgotPass = async (req, res) => {
   try {
     const user = await userSchema.findOne({ email }).select("-password");
     if (!user) {
-      return res.status(404).send("user not found or please give a valid gmail address");
+      return res
+        .status(404)
+        .send("user not found or please give a valid gmail address");
     }
     const token = Math.floor(100000 + Math.random() * 999999);
 
@@ -192,10 +194,10 @@ const updatePass = async (req, res) => {
 };
 
 const deleteuser = async (req, res) => {
-  const { name } = req.body;
-  if (name) {
+  const userId = req.user.id;
+  if (userId) {
     try {
-      const deleteUser = await userSchema.findOneAndDelete({ name });
+      const deleteUser = await userSchema.findByIdAndDelete(userId).select("-password");
       res
         .status(200)
         .json({ message: "User Deleted Successfully", deleteUser });

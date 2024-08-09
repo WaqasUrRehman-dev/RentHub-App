@@ -232,17 +232,17 @@ paths:
         - application/json
       consumes:
         - application/json
-      parameters:
-        - in: body
-          name: Delete User Account
-          schema:
-            type: object
-            required:
-              - name
-            properties:
-              name:
-                type: string
-                example: john
+      # parameters:
+      #   - in: body
+      #     name: Delete User Account
+      #     schema:
+      #       type: object
+      #       required:
+      #         - name
+      #       properties:
+      #         name:
+      #           type: string
+      #           example: john
       responses:
         '201':
           description: User Deleted Successfully

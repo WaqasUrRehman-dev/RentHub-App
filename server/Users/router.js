@@ -28,6 +28,6 @@ router.post("/forgotpassword", forgotPass);
 router.put("/update-password", updatePass);
 router.put("/update-user",protectRoute, editUser);
 
-router.delete("/delete-user", deleteuser);
+router.delete("/delete-user",protectRoute, deleteuser);
 
 module.exports = router;
